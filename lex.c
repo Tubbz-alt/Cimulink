@@ -37,6 +37,9 @@ read_op(char* input, int ii, int nn)
     memcpy(op, input, 4);
 
     for (int ii = 0; ii < 7; ii++) {
+        // only check if first two letters are valid
+        // (no operators share first two letters)
+        // not ideal for input verification
         if (!strncmp(validops[ii], op, 2)) {
             // truncate string to appropriate length
             op[strlen(validops[ii])] = 0;
@@ -44,8 +47,50 @@ read_op(char* input, int ii, int nn)
         }
     }
 
-    fprintf(stderr, "Invalid operator: %s\n", op);
+    fprintf(stderr, "Invalid input: %s\n", op);
     exit(1);
+}
+
+
+sexp_ast*
+make_sexp_ast(void)
+{
+    sexp_ast* node = malloc(sizeof(sexp_ast));
+    node->left = 0;
+    node->right = 0;
+    return node;
+}
+
+void
+free_sexp_ast(sexp_ast* node)
+{
+    if (node != 0) {
+        free_sexp_ast(node->left);
+        free_sexp_ast(node->right);
+        free(node);
+    }
+}
+
+char*
+printf_sexp_ast(sexp_ast* tree)
+{
+    char buf[100] = "";
+    if (tree) {
+        char lstr[8] = "";
+        char rstr[8] = "";
+        if (tree->left)  { strcat(lstr, tree->left->data); }
+        if (tree->right) { strcat(rstr, tree->right->data); }
+
+        strcat(buf, "(");
+        strcat(buf, tree->data);
+        strcat(buf, " ");
+        strcat(buf, lstr);
+        strcat(buf, " ");
+        strcat(buf, rstr);
+        strcat(buf, ")");
+    }
+    printf("%s\n", buf);
+    return buf;
 }
 
 sexp_ast*
@@ -65,16 +110,16 @@ lex(char* input)
         if (ischar(&input[ii], "(")) {
             ii++;
             depth++;
-            printf("lparen\n");
             continue;
         }
         if (ischar(&input[ii], ")")) {
             ii++;
             depth--;
-            printf("rparen\n");
             continue;
         }
         if (isvar(&input[ii])) {
+            // leaves, non-recursive
+
             char* var = malloc(sizeof(char));
             strncpy(var, &input[ii], 1);
             var[1] = 0;
@@ -83,12 +128,9 @@ lex(char* input)
             if(!head->left) {
                 head->left = make_sexp_ast();
                 head->left->data = var;
-                // head = head->left ???
-                printf("left node: %s\n", head->left->data);
             } else {
                 head->right = make_sexp_ast();
                 head->right->data = var;
-                printf("right node: %s\n", head->right->data);
             }
             continue;
         }
@@ -101,29 +143,8 @@ lex(char* input)
             ast->data = op;
             head = ast;
         }
-        printf("head data: %s\n", head->data);
-
         ii += strlen(op);
-        free(op);
     }
+    printf_sexp_ast(ast);
     return ast;
-}
-
-sexp_ast*
-make_sexp_ast(void)
-{
-    sexp_ast* node = malloc(sizeof(sexp_ast));
-    node->left = 0;
-    node->right = 0;
-    return node;
-}
-
-void
-free_sexp_ast(sexp_ast* node)
-{
-    if (node != 0) {
-        free_sexp_ast(node->left);
-        free_sexp_ast(node->right);
-        free(node);
-    }
 }
