@@ -1,5 +1,6 @@
 #include <string.h>
 #include <stdlib.h>
+#include <ctype.h>  // isspace
 #include <stdio.h>
 
 #include "lex.h"
@@ -45,44 +46,53 @@ isvar(char* s)
 char*
 read_op(char* input, int ii, int nn)
 {
-    if (nn - ii < 3) {
-        perror("Invalid input.\n");
-        exit(1);
-    }  
+    char* validops[7] = {"and", "nand", "or", "nor", "xor", "xnor", "not"};
+    char* op = malloc(4);
+    memcpy(op, input, 4);
+
+    for (int ii = 0; ii < 7; ii++) {
+        if (!strncmp(validops[ii], op, 2)) {
+            // truncate string to appropriate length
+            op[strlen(validops[ii])] = 0;
+            return op;
+        }
+    }
+
+    printf("Invalid operator: %s\n", op);
+    exit(1);
 }
 
 bool_ast
 lex(char* input)
 {
     int nn = strlen(input);
-    int ii = 0;
+    int ii = 0;      // index in input string
+    int balance = 0; // balanced parens := 0
     while (ii < nn) {
-        // space characters, pass
         if (isspace(input[ii])) {
             ii++;
-            printf("space\n");
             continue;
         }
-        // left paren control
         if (islparen(&input[ii])) {
             ii++;
             printf("lparen\n");
+            balance++;
             continue;
         }
-        // right paren control
         if (isrparen(&input[ii])) {
             ii++;
             printf("rparen\n");
+            balance--;
             continue;
         }
-        // variable control (leaves)
         if (isvar(&input[ii])) {
             ii++;
             printf("var\n");
             continue;
         }
         
-        // char* op = read_op(&input[ii], ii, nn);
-        // printf("%s\n", op);
+        char* op = read_op(&input[ii], ii, nn);
+        printf("%s\n", op);
+        ii += strlen(op);
     }
 }
