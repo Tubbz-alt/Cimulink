@@ -1,18 +1,14 @@
-
-
+BIN  := booler
 SRCS := $(wildcard *.c)
 OBJS := $(SRCS:.c=.o)
 
-CFLAGS := -g
+CFLAGS := -g -Wall
 
-booler: booler.o parse.o
-	gcc $(CFLAGS) -o $@ $^
+$(BIN): $(OBJS)
+	$(CC) -o $@ $(OBJS) $(LDLIBS)
 
-booler.o: booler.c parse.h
-	gcc $(CFLAGS) -c -o $@ $<
-
-parse.o: parse.c parse.h
-	gcc $(CFLAGS) -c -o $@ $<
+%.o : %.c $(wildcard *.h)
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:
-	rm booler *.o
+	rm *.o $(BIN)
