@@ -19,7 +19,7 @@ void
 free_svec(svec* sv)
 {
     for (int ii = 0; ii < sv->size; ++ii) {
-        free(sv->data[ii]);
+        // free(sv->data[ii]);
     }
     free(sv->data); // pair to sv->data malloc()
     free(sv);       // pair to sv malloc()
@@ -52,11 +52,21 @@ svec_push_back(svec* sv, node* item)
     svec_put(sv, ii, item);
 }
 
+svec*
+svec_sub(svec* sv, int ii, int jj)
+{
+    assert(ii >=0 && jj <= sv->size);    
+    svec* subvec = make_svec();
+    for(int kk = ii; kk < jj; ++kk) {
+        svec_push_back(subvec, sv->data[kk]);
+    }
+    return subvec;
+}
+
 void
 svec_print(svec* sv)
 {
     for (int ii = 0; ii < sv->size; ++ii) {
-        printf("%s ", sv->data[ii]->key);
+        printf("%s\ttype %d\n", sv->data[ii]->key, sv->data[ii]->type);
     }
-    printf("\n");
 }

@@ -6,12 +6,6 @@
 #include "token.h"
 #include "svec.h"
 
-#define TYPE_OPER 0
-#define TYPE_ATOM 1
-#define TYPE_LPAR 2
-#define TYPE_RPAR 3
-#define TYPE_VARI 4
-
 // compare char s to char* cmp without touching heap
 static
 int
@@ -59,13 +53,13 @@ static
 char*
 extract_op(char* input, int ii, int nn)
 {
-    char* validops[7] = {"and", "nand", "or", "nor", "xor", "xnor", "not"};
+    char* validops[6] = {"and", "nand", "or", "nor", "xor", "xnor"};
     char* op = malloc(4);
     // this is reading into unverified piece of input char*,
     // only invalid if user input is invalid (ops before args)
     memcpy(op, input, 4);
 
-    for (int ii = 0; ii < 7; ii++) {
+    for (int ii = 0; ii < 6; ii++) {
         // only check if first two letters are valid
         // (no operators share first two letters)
         // not ideal for input verification
@@ -112,7 +106,7 @@ tokenize(char* input)
 
         if (isvar(&input[ii])) {
             char* ex = extract_char(input, ii, 1);
-            node* nn = make_node(ex, TYPE_VARI);
+            node* nn = make_node(ex, TYPE_ATOM);
             svec_push_back(tokens, nn);
             ii++;
             continue;
@@ -131,6 +125,5 @@ tokenize(char* input)
         exit(1);
     }
 
-    svec_print(tokens);
     return tokens;
 }
