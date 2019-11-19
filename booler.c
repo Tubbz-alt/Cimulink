@@ -3,6 +3,7 @@
 
 #include "token.h"
 #include "svec.h"
+#include "lex.h"
 
 int
 main(int argc, char* argv[])
@@ -14,6 +15,11 @@ main(int argc, char* argv[])
 
   printf("%s\n", argv[1]);
   svec* tokens = tokenize(argv[1]);
+  sexp_ast* ast = lex(tokens);
+
+  // free_sexp_ast(ast);
+  free_svec(tokens);
+
 
   return 0;
 }

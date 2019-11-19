@@ -6,6 +6,12 @@
 #include "token.h"
 #include "svec.h"
 
+#define TYPE_OPER 0
+#define TYPE_ATOM 1
+#define TYPE_LPAR 2
+#define TYPE_RPAR 3
+#define TYPE_VARI 4
+
 // compare char s to char* cmp without touching heap
 static
 int
@@ -36,6 +42,16 @@ extract_char(char* input, int ii, int nn)
     strncpy(val, &input[ii], nn);
     val[1] = 0;
     return val;
+}
+
+static
+node*
+make_node(char* key, int type)
+{
+    node* nn = malloc(sizeof(node));
+    nn->key = key;
+    nn->type = type;
+    return nn;
 }
 
 // Read operation from input in bounds {ii, nn}
@@ -78,7 +94,8 @@ tokenize(char* input)
         
         if (ischar(&input[ii], "(")) {
             char* ex = extract_char(input, ii, 1);
-            svec_push_back(tokens, ex);
+            node* nn = make_node(ex, TYPE_LPAR);
+            svec_push_back(tokens, nn);
             ii++;
             depth++;
             continue;
@@ -86,7 +103,8 @@ tokenize(char* input)
 
         if (ischar(&input[ii], ")")) {
             char* ex = extract_char(input, ii, 1);
-            svec_push_back(tokens, ex);
+            node* nn = make_node(ex, TYPE_RPAR);
+            svec_push_back(tokens, nn);
             ii++;
             depth--;
             continue;
@@ -94,13 +112,15 @@ tokenize(char* input)
 
         if (isvar(&input[ii])) {
             char* ex = extract_char(input, ii, 1);
-            svec_push_back(tokens, ex);
+            node* nn = make_node(ex, TYPE_VARI);
+            svec_push_back(tokens, nn);
             ii++;
             continue;
         }
         
         char* op = extract_op(&input[ii], ii, nn);
-        svec_push_back(tokens, op);
+        node* nn = make_node(op, TYPE_OPER);
+        svec_push_back(tokens, nn);
         ii += strlen(op);
     }
 
