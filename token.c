@@ -1,11 +1,12 @@
-#include <string.h>
-#include <stdlib.h>
-#include <ctype.h>  // isspace
 #include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include <string.h>
 
-#include "lex.h"
+#include "token.h"
+#include "svec.h"
 
-// wrapper for strcmp
+// compare char s to char* cmp without touching heap
 static
 int
 ischar(char* s, char* cmp)
@@ -16,6 +17,7 @@ ischar(char* s, char* cmp)
     return !strcmp(c, cmp);
 }
 
+// compare char s to possible vars
 static
 int
 isvar(char* s)
@@ -25,10 +27,21 @@ isvar(char* s)
     return ischar(s, "T") || ischar(s, "F") || (isdigit(*s) && 0 < atol(s) && atol(s) < 9);
 }
 
+// copy nn chars from input buffer at index ii and null terminate
+static
+char* 
+extract_char(char* input, int ii, int nn)
+{
+    char* val = malloc(sizeof(char));
+    strncpy(val, &input[ii], nn);
+    val[1] = 0;
+    return val;
+}
+
 // Read operation from input in bounds {ii, nn}
 static
 char*
-read_op(char* input, int ii, int nn)
+extract_op(char* input, int ii, int nn)
 {
     char* validops[7] = {"and", "nand", "or", "nor", "xor", "xnor", "not"};
     char* op = malloc(4);
@@ -46,107 +59,49 @@ read_op(char* input, int ii, int nn)
             return op;
         }
     }
-
     fprintf(stderr, "Invalid input: %s\n", op);
     exit(1);
 }
 
-
-sexp_ast*
-make_sexp_ast(void)
+svec*
+tokenize(char* input)
 {
-    sexp_ast* node = malloc(sizeof(sexp_ast));
-    node->left = 0;
-    node->right = 0;
-    return node;
-}
-
-void
-free_sexp_ast(sexp_ast* node)
-{
-    if (node != 0) {
-        free_sexp_ast(node->left);
-        free_sexp_ast(node->right);
-        free(node);
-    }
-}
-
-char*
-print_sexp_ast(sexp_ast* tree)
-{
-    char buf[1024] = "";
-    char lstr[8] = "";
-    char rstr[8] = "";
-    
-    if (tree->type == 1) { // op 
-        if (tree->left)  { strcat(lstr, print_sexp_ast(tree->left)); }
-        if (tree->right) { strcat(rstr, print_sexp_ast(tree->right)); }
-
-        strcat(buf, "(");
-        strcat(buf, tree->data);
-        strcat(buf, " ");
-        strcat(buf, lstr);
-        strcat(buf, " ");
-        strcat(buf, rstr);
-        strcat(buf, ")");
-    }
-    if (tree->type == 1) { // atom
-
-    }
-    printf("%s\n", buf);
-    return buf;
-}
-
-sexp_ast*
-lex(char* input)
-{
-    sexp_ast *ast = make_sexp_ast();    // pointer to root of tree
-    sexp_ast *head = ast; // current pointer into ast
-    int depth = 0; // nested depth of parens
-
     int nn = strlen(input);
     int ii = 0;      // index in input string
+    int depth = 0;    // balanced parens := 0
+    svec* tokens = make_svec();
     while (ii < nn) {
-
         if (isspace(input[ii])) {
             ii++;
             continue;
         }
         
         if (ischar(&input[ii], "(")) {
+            char* ex = extract_char(input, ii, 1);
+            svec_push_back(tokens, ex);
             ii++;
             depth++;
             continue;
         }
 
         if (ischar(&input[ii], ")")) {
+            char* ex = extract_char(input, ii, 1);
+            svec_push_back(tokens, ex);
             ii++;
             depth--;
             continue;
         }
 
         if (isvar(&input[ii])) {
-            // leaves, non-recursive
-
-            char* var = malloc(sizeof(char));
-            strncpy(var, &input[ii], 1);
-            var[1] = 0;
+            char* ex = extract_char(input, ii, 1);
+            svec_push_back(tokens, ex);
             ii++;
-
-            if(!head->left) {
-                head->left = make_sexp_ast();
-                head->left->data = var;
-            } else {
-                head->right = make_sexp_ast();
-                head->right->data = var;
-            }
             continue;
         }
         
-        char* op = read_op(&input[ii], ii, nn);
-        // printf("%s\n", op);
+        char* op = extract_op(&input[ii], ii, nn);
+        svec_push_back(tokens, op);
         ii += strlen(op);
-        head->data = op;
     }
 
     // unbalanced input sexp
@@ -155,6 +110,7 @@ lex(char* input)
         fprintf(stderr, "Unbalanced sexp.\n");
         exit(1);
     }
-    print_sexp_ast(ast);
-    return ast;
+
+    svec_print(tokens);
+    return tokens;
 }

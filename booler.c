@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "lex.h"
+#include "token.h"
+#include "svec.h"
 
 int
 main(int argc, char* argv[])
@@ -12,6 +13,7 @@ main(int argc, char* argv[])
   }
 
   printf("%s\n", argv[1]);
-  sexp_ast* exp = lex(argv[1]);
+  svec* tokens = tokenize(argv[1]);
+
   return 0;
 }

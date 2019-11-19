@@ -3,7 +3,8 @@
 
 // abstract syntax tree representing boolean expression.
 typedef struct sexp_ast {
-  char* data;
+  char* data; // string literal
+  int type;   // op (0) or atom (1)
   struct sexp_ast* left;
   struct sexp_ast* right;
 } sexp_ast;
