@@ -34,7 +34,7 @@ void svec_put(svec* sv, int ii, node* item);
 void svec_push_back(svec* sv, node* item);
 
 // sub-svec from indeces ii to jj
-svec* svec_sub(svec* sv, int ii, int jj);
+svec* svec_slice(svec* sv, int ii, int jj);
 
 // print the sv (debugging).
 void svec_print(svec* sv);

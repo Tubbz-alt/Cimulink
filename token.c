@@ -53,7 +53,7 @@ static
 char*
 extract_op(char* input, int ii, int nn)
 {
-    char* validops[6] = {"and", "nand", "or", "nor", "xor", "xnor"};
+    const char* validops[6] = {"and", "nand", "or", "nor", "xor", "xnor"};
     char* op = malloc(4);
     // this is reading into unverified piece of input char*,
     // only invalid if user input is invalid (ops before args)

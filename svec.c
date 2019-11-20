@@ -53,7 +53,7 @@ svec_push_back(svec* sv, node* item)
 }
 
 svec*
-svec_sub(svec* sv, int ii, int jj)
+svec_slice(svec* sv, int ii, int jj)
 {
     assert(ii >=0 && jj <= sv->size);    
     svec* subvec = make_svec();

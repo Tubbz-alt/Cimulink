@@ -17,9 +17,6 @@ main(int argc, char* argv[])
   svec* tokens = tokenize(argv[1]);
   sexp_ast* ast = lex(tokens);
 
-  // free_sexp_ast(ast);
-  free_svec(tokens);
-
 
   return 0;
 }

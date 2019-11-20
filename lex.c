@@ -8,24 +8,39 @@
 #include "token.h"
 
 sexp_ast*
-make_sexp_ast(void)
+make_sexp_op_ast(char* op, sexp_ast* arg0, sexp_ast* arg1)
 {
-    sexp_ast* node = malloc(sizeof(sexp_ast));
-    node->left = 0;
-    node->right = 0;
-    node->up = 0;
-    return node;
+    sexp_op_ast* node = malloc(sizeof(sexp_ast));
+    node->op = op;
+    node->arg0 = arg0;
+    node->arg1 = arg1;
+    return (sexp_ast*)node;
 }
 
+sexp_ast*
+make_sexp_var_ast(char* var)
+{
+    sexp_var_ast* node = calloc(1, sizeof(sexp_ast));
+    node->op = "var";
+    node->var = var;
+    return (sexp_ast*)node;
+}
+
+/*
 void
 free_sexp_ast(sexp_ast* node)
 {
     if (node) {
-        free_sexp_ast(node->left);
-        free_sexp_ast(node->right);
+        if (node->arg0) {
+            free_sexp_ast(node->arg0);
+        }
+        if (node->arg1) {
+            free_sexp_ast(node->arg1);
+        }
         free(node);
     }
 }
+*/
 
 /*
 char*
@@ -61,6 +76,7 @@ split_args(svec* args)
 {
     int balance = 0;
     for (int ii = 0; ii < args->size; ii++) {
+        if (args->data[ii]->type == TYPE_OPER) { continue; }
         if (args->data[ii]->type == TYPE_LPAR) { balance++; }
         if (args->data[ii]->type == TYPE_RPAR) { balance--; }
         if (balance == 0) { return ii + 1; }
@@ -71,37 +87,14 @@ split_args(svec* args)
 sexp_ast*
 lex(svec* tokens)
 {
-    sexp_ast* ast = make_sexp_ast();
-    sexp_ast* head = ast;
-
-    switch (tokens->data[0]->type) {
-    case TYPE_LPAR: {
-        svec *sub_sexp = svec_sub(tokens, 1, tokens->size - 1);
-
-        // set operator
-
-        break;
+    if (tokens->data[0]->type == TYPE_LPAR) {
+        svec* expr = svec_slice(tokens, 1, tokens->size - 1);
+        int split = split_args(expr);
+        svec* arg0 = svec_slice(expr, 1, split);
+        svec* arg1 = svec_slice(expr, split, expr->size);
+        lex(arg0);
+        lex(arg1);
+    } else {
+        printf("leaf %s\n", tokens->data[0]->key);
     }
-    case TYPE_OPER: {
-        svec *args = svec_sub(tokens, 1, tokens->size);
-        int split = split_args(args) + 1;
-        svec* arg1 = svec_sub(tokens, 0, split);
-        svec* arg2 = svec_sub(tokens, split, tokens->size);
-
-        // recur down each branch
-
-        free_svec(args);
-        break;
-    }
-    case TYPE_ATOM: {
-
-        // base case
-
-        break;
-    }
-    default:
-        fprintf(stderr, "Unkown node tag: %s\n", tokens->data[0]->key);
-    }
-
-    return ast;
 }
