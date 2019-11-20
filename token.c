@@ -24,7 +24,7 @@ isvar(char* s)
 {
     // valid variables:
     // {1..8,T, F}
-    return ischar(s, "T") || ischar(s, "F") || (isdigit(*s) && 0 < atol(s) && atol(s) < 9);
+    return ischar(s, "T") || ischar(s, "F") || (isdigit(*s) && 0 <= atol(s) && atol(s) < 8);
 }
 
 // copy nn chars from input buffer at index ii and null terminate

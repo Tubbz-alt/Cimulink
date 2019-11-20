@@ -3,7 +3,7 @@
 #include <ctype.h>  // isspace
 #include <stdio.h>
 
-#include "lex.h"
+#include "parse.h"
 #include "svec.h"
 #include "token.h"
 
