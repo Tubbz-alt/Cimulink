@@ -18,6 +18,7 @@ make_sexp_ast(char* op, sexp_ast* arg0, sexp_ast* arg1)
 }
 
 // the index to split args svec.
+static
 int
 split_args(svec* args)
 {

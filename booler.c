@@ -14,7 +14,6 @@ main(int argc, char* argv[])
     exit(1);
   }
 
-  printf("%s\n", argv[1]);
   svec* tokens = tokenize(argv[1]);
   sexp_ast* ast = lex(tokens);
   static char* inputs[8] = {"0","1","0","0","0","0","0","1"};
