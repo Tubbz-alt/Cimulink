@@ -37,10 +37,14 @@ split_args(svec* args)
 void
 sexp_print(sexp_ast* ast)
 {
-    if (ast->arg0) {
+    if (ast->arg1) {
         printf("head %s\n", ast->op);
         sexp_print(ast->arg0);
         sexp_print(ast->arg1);
+    }
+    else if (ast->arg0) {
+        printf("head %s\n", ast->op);
+        sexp_print(ast->arg0);
     }
     else {
         printf("leaf %s\n", ast->op);
@@ -52,6 +56,12 @@ lex(svec* tokens)
 {
     if (tokens->data[0]->type == TYPE_LPAR) {
         svec* expr = svec_slice(tokens, 1, tokens->size - 1);
+
+        // not is special case with asymmetric leaf types.
+        if (strcmp(tokens->data[1]->key, "not") == 0) {
+            svec* arg0 = svec_slice(expr, 1, expr->size);
+            return make_sexp_ast(tokens->data[1]->key, lex(arg0), 0);
+        }
         int split = split_args(expr);
         svec* arg0 = svec_slice(expr, 1, split);
         svec* arg1 = svec_slice(expr, split, expr->size);

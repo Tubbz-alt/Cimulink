@@ -53,17 +53,16 @@ static
 char*
 extract_op(char* input, int ii, int nn)
 {
-    const char* validops[6] = {"and", "nand", "or", "nor", "xor", "xnor"};
+    const char* validops[4] = {"and", "or", "xor", "not"};
     char* op = malloc(4);
     // this is reading into unverified piece of input char*,
     // only invalid if user input is invalid (ops before args)
-    memcpy(op, input, 4);
-
-    for (int ii = 0; ii < 6; ii++) {
+    memcpy(op, input, 3);
+    for (int ii = 0; ii < 4; ii++) {
         // only check if first two letters are valid
         // (no operators share first two letters)
         // not ideal for input verification
-        if (!strncmp(validops[ii], op, 2)) {
+        if (strncmp(validops[ii], op, 2) == 0) {
             // truncate string to appropriate length
             op[strlen(validops[ii])] = 0;
             return op;
