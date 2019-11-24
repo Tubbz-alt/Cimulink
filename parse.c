@@ -51,6 +51,22 @@ sexp_print(sexp_ast* ast)
     }
 }
 
+int
+sexp_equal(sexp_ast* ast0, sexp_ast* ast1)
+{
+    if (ast0->arg1 && ast1->arg1) {
+        return strcmp(ast0->op, ast1->op) == 0
+        && sexp_equal(ast0->arg0, ast1->arg0)
+        && sexp_equal(ast0->arg1, ast1->arg1);
+    }
+    else if (ast0->arg0 && ast1->arg0) {
+        return sexp_equal(ast0->arg0, ast1->arg0);
+    }
+    else {
+        return strcmp(ast0->op, ast1->op) == 0;
+    }
+}
+
 sexp_ast*
 lex(svec* tokens)
 {

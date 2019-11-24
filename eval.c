@@ -47,7 +47,11 @@ evaluate_inserted(sexp_ast* ast)
     }
     // has arg0, not arg1 -- "not"
     else if (ast->arg0) {
-        return !evaluate_inserted(ast->arg0);
+        if (strcmp(ast->op, "not") == 0) {
+            return !evaluate_inserted(ast->arg0);
+        }
+        fprintf(stderr, "corrupted operator: %s\n", ast->op);
+        exit(1);
     }
     else {
         return atoi(ast->op);

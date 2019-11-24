@@ -18,6 +18,7 @@ void free_sexp_ast(sexp_ast* ast);
 
 sexp_ast* lex(svec* input);
 
+int sexp_equal(sexp_ast* ast0, sexp_ast* ast1);
 void sexp_print(sexp_ast* ast);
 
 #endif

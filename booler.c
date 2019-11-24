@@ -5,6 +5,7 @@
 #include "svec.h"
 #include "parse.h"
 #include "eval.h"
+#include "reduce.h"
 
 int
 main(int argc, char* argv[])
@@ -16,8 +17,9 @@ main(int argc, char* argv[])
 
   svec* tokens = tokenize(argv[1]);
   sexp_ast* ast = lex(tokens);
-  static char* inputs[8] = {"0","1","0","0","0","0","0","1"};
-  int eval = evaluate(ast, inputs);
-  printf("eval = %d\n", eval);
+  // static char* inputs[8] = {"0","1","0","0","0","0","0","1"};
+  // int eval = evaluate(ast, inputs);
+  // printf("eval = %d\n", eval);
+  reduce(ast);
   return 0;
 }
