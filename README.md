@@ -96,27 +96,43 @@ X    not   ==> F
 ```
 ### Commutativity
 ```
-  and          and
- /   \   ==>  /   \
-X     Y      Y     X
+  and            and
+ /   \   ==>    /   \
+X     Y        Y     X
 ```
 ```
-  or          or
- /  \   ==>  /  \
-X    Y      Y    X
+  or            or
+ /  \   ==>    /  \
+X    Y        Y    X
 ```
 ### Associativity
 ```
-  or              or
- /  \       ==>  /  \
-X   or          Y   or
-   /  \            /  \
-  Y    Z          X    Z
+  or                or
+ /  \       ==>    /  \
+X   or            Y   or
+   /  \              /  \
+  Y    Z            X    Z
 ```
 ```
-  and              and
- /   \       ==>  /   \
-X    and         Y    and
-    /   \            /   \
-   Y     Z          X     Z
+  and                and
+ /   \       ==>    /   \
+X    and           Y    and
+    /   \              /   \
+   Y     Z            X     Z
+```
+
+### Distributivity
+```
+      and                  or
+    /     \               /  \
+  or        or     ==>   X   and
+ /  \      /  \             /   \
+X    Y    X    Z           Y     Z
+```
+```
+        or                   and
+      /    \                /   \
+  and        and     ==>   X    or
+ /   \      /   \              /  \
+X     Y    X     Z            Y    Z
 ```
