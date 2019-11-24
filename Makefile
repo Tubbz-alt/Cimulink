@@ -1,4 +1,4 @@
-BIN  := booler
+BIN  := cimulink
 SRCS := $(wildcard *.c)
 OBJS := $(SRCS:.c=.o)
 
