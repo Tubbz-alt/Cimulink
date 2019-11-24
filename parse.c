@@ -14,7 +14,21 @@ make_sexp_ast(char* op, sexp_ast* arg0, sexp_ast* arg1)
     node->op = op;
     node->arg0 = arg0;
     node->arg1 = arg1;
-    return (sexp_ast*)node;
+    return node;
+}
+
+void
+free_sexp_ast(sexp_ast* ast)
+{
+    if (ast->arg1) {
+        free_sexp_ast(ast->arg0);
+        free_sexp_ast(ast->arg1);
+        free(ast);
+    }
+    if (ast->arg0) {
+        free_sexp_ast(ast->arg0);
+        free(ast);
+    }
 }
 
 // the index to split args svec.
@@ -60,7 +74,8 @@ sexp_equal(sexp_ast* ast0, sexp_ast* ast1)
         && sexp_equal(ast0->arg1, ast1->arg1);
     }
     else if (ast0->arg0 && ast1->arg0) {
-        return sexp_equal(ast0->arg0, ast1->arg0);
+        return strcmp(ast0->op, ast1->op) == 0
+        && sexp_equal(ast0->arg0, ast1->arg0);
     }
     else {
         return strcmp(ast0->op, ast1->op) == 0;
@@ -68,7 +83,7 @@ sexp_equal(sexp_ast* ast0, sexp_ast* ast1)
 }
 
 sexp_ast*
-lex(svec* tokens)
+parse(svec* tokens)
 {
     if (tokens->data[0]->type == TYPE_LPAR) {
         svec* expr = svec_slice(tokens, 1, tokens->size - 1);
@@ -76,12 +91,12 @@ lex(svec* tokens)
         // not is special case with asymmetric leaf types.
         if (strcmp(tokens->data[1]->key, "not") == 0) {
             svec* arg0 = svec_slice(expr, 1, expr->size);
-            return make_sexp_ast(tokens->data[1]->key, lex(arg0), 0);
+            return make_sexp_ast(tokens->data[1]->key, parse(arg0), 0);
         }
         int split = split_args(expr);
         svec* arg0 = svec_slice(expr, 1, split);
         svec* arg1 = svec_slice(expr, split, expr->size);
-        sexp_ast* ast = make_sexp_ast(tokens->data[1]->key, lex(arg0), lex(arg1));
+        sexp_ast* ast = make_sexp_ast(tokens->data[1]->key, parse(arg0), parse(arg1));
         return ast;
     } else {
         sexp_ast* ast = make_sexp_ast(tokens->data[0]->key, 0, 0);

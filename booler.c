@@ -16,10 +16,10 @@ main(int argc, char* argv[])
   }
 
   svec* tokens = tokenize(argv[1]);
-  sexp_ast* ast = lex(tokens);
+  sexp_ast* ast = parse(tokens);
   // static char* inputs[8] = {"0","1","0","0","0","0","0","1"};
   // int eval = evaluate(ast, inputs);
   // printf("eval = %d\n", eval);
-  reduce(ast);
+  ast = reduce(ast);
   return 0;
 }

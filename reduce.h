@@ -3,6 +3,6 @@
 
 #include "parse.h"
 
-void reduce(sexp_ast* ast);
+sexp_ast* reduce(sexp_ast* ast);
 
 #endif
