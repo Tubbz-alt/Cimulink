@@ -21,5 +21,6 @@ main(int argc, char* argv[])
   // int eval = evaluate(ast, inputs);
   // printf("eval = %d\n", eval);
   ast = reduce(ast);
+  sexp_print(ast);
   return 0;
 }

@@ -10,12 +10,12 @@ static
 sexp_ast*
 identity(sexp_ast* ast)
 {
-    if (strcmp(ast->op, "and")
-    && strcmp(ast->arg1->op, "T")) {
+    if (strcmp(ast->op, "and") == 0
+    && strcmp(ast->arg1->op, "T") == 0) {
         return ast->arg0;
     }
-    if (strcmp(ast->op, "or")
-    && strcmp(ast->arg1->op, "F")) {
+    if (strcmp(ast->op, "or") == 0
+    && strcmp(ast->arg1->op, "F") == 0) {
         return ast->arg0;
     }
     return ast;
@@ -27,13 +27,13 @@ static
 sexp_ast*
 null(sexp_ast* ast)
 {
-    if (strcmp(ast->op, "and")
-    && strcmp(ast->arg1->op, "F")) {
+    if (strcmp(ast->op, "and") == 0
+    && strcmp(ast->arg1->op, "F") == 0) {
         // free_sexp_ast(ast);
         return make_sexp_ast("F", 0, 0);
     }
-    if (strcmp(ast->op, "or")
-    && strcmp(ast->arg1->op, "T")) {
+    if (strcmp(ast->op, "or") == 0
+    && strcmp(ast->arg1->op, "T") == 0) {
         return make_sexp_ast("T", 0, 0);
     }
     return ast; 
@@ -144,9 +144,25 @@ distributivity(sexp_ast* ast)
     return ast;
 }
 
+static
+sexp_ast*
+tryall(sexp_ast* ast)
+{
+    // ast = distributivity(ast);
+    // ast = complementarity(ast);
+    // ast = identity(ast);
+}
+
 sexp_ast*
 reduce(sexp_ast* ast)
 {
-    sexp_print(ast);
+    ast = tryall(ast);
+    if (ast->arg1) {
+        ast->arg0 = reduce(ast->arg0);
+        ast->arg1 = reduce(ast->arg1);
+    }
+    else if (ast->arg0) {
+        ast->arg0 = reduce(ast->arg0);
+    }
     return ast;
 }

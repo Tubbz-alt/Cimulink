@@ -48,21 +48,33 @@ split_args(svec* args)
     exit(1);
 }
 
+static
+void
+sexp_print_recur(sexp_ast* ast)
+{
+    if (ast->arg1) {
+        printf("(%s ", ast->op);
+        sexp_print_recur(ast->arg0);
+        printf(" ");
+        sexp_print_recur(ast->arg1);
+        printf(")");
+    }
+    else if (ast->arg0) {
+        printf("(%s ", ast->op);
+        sexp_print_recur(ast->arg0);
+        printf(")");
+    }
+    else {
+        printf("%s", ast->op);
+    }
+}
+
+// this is just to have a \n at the end of recursive printing
 void
 sexp_print(sexp_ast* ast)
 {
-    if (ast->arg1) {
-        printf("head %s\n", ast->op);
-        sexp_print(ast->arg0);
-        sexp_print(ast->arg1);
-    }
-    else if (ast->arg0) {
-        printf("head %s\n", ast->op);
-        sexp_print(ast->arg0);
-    }
-    else {
-        printf("leaf %s\n", ast->op);
-    }
+    sexp_print_recur(ast);
+    printf("\n");
 }
 
 int
