@@ -79,13 +79,13 @@ complementarity(sexp_ast* ast)
     && strcmp(ast->arg1->op, "not") == 0
     && sexp_equal(ast->arg0, ast->arg1->arg0)) {
         // free_sexp_ast(ast);
-        return make_sexp_ast("T", 0, 0);
+        return make_sexp_ast("F", 0, 0);
     }
     if (strcmp(ast->op, "or") == 0 
     && strcmp(ast->arg1->op, "not") == 0
     && sexp_equal(ast->arg0, ast->arg1->arg0)) {
         // free_sexp_ast(ast);
-        return make_sexp_ast("F", 0, 0);
+        return make_sexp_ast("T", 0, 0);
     }
     return ast;
 }
@@ -148,21 +148,40 @@ static
 sexp_ast*
 tryall(sexp_ast* ast)
 {
-    // ast = distributivity(ast);
-    // ast = complementarity(ast);
-    // ast = identity(ast);
+    ast = identity(ast);
+    ast = null(ast);
+    ast = idempotency(ast);
+    ast = involution(ast);
+    ast = complementarity(ast);
+    // ast = commutativity(ast);
+    // ast = associativity(ast);
+    ast = distributivity(ast);
+    return ast;
+}
+
+static
+sexp_ast*
+reduce_recur(sexp_ast* ast)
+{
+
+    ast = tryall(ast);
+    if (ast->arg1) {
+        ast->arg0 = reduce_recur(ast->arg0);
+        ast->arg1 = reduce_recur(ast->arg1);
+    }
+    else if (ast->arg0) {
+        ast->arg0 = reduce_recur(ast->arg0);
+    }
+    return ast;
 }
 
 sexp_ast*
 reduce(sexp_ast* ast)
 {
-    ast = tryall(ast);
-    if (ast->arg1) {
-        ast->arg0 = reduce(ast->arg0);
-        ast->arg1 = reduce(ast->arg1);
-    }
-    else if (ast->arg0) {
-        ast->arg0 = reduce(ast->arg0);
+    sexp_ast* comp = make_sexp_ast(ast->op, ast->arg0, ast->arg1);
+    ast = reduce_recur(ast);
+    if (!sexp_equal(ast, comp)) {
+        ast = reduce(ast);
     }
     return ast;
 }
