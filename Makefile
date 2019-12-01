@@ -11,4 +11,4 @@ $(BIN): $(OBJS)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:
-	rm -f *.o $(BIN) data.dat
+	rm -f *.o $(BIN)
