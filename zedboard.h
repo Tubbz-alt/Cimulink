@@ -1,6 +1,8 @@
 #ifndef ZEDBOARD_H
 #define ZEDBOARD_H
 
-void zedboard(void);
+#include "parse.h"
+
+void zedboard(sexp_ast* ast);
 
 #endif
