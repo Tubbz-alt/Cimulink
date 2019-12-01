@@ -1,18 +1,22 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "token.h"
 #include "svec.h"
 #include "parse.h"
-#include "eval.h"
 #include "reduce.h"
+#include "zedboard.h"
 
 int
 main(int argc, char* argv[])
 {
   if (argc != 2) {
-    fprintf(stderr, "Usage:\n\t./booler \"boolexp\"\n");
+    fprintf(stderr, "Usage:\n\t./booler \"boolexp\" or \"zedboard\"\n");
     exit(1);
+  }
+  else if (strcmp(argv[1], "zedboard") == 0) {
+    zedboard();
   }
 
   svec* tokens = tokenize(argv[1]);
